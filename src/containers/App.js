@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import './App.scss';
-
-import Search from './components/Search';
-import Error from './components/Error';
-import Loading from './components/Loading';
-import Cell from './components/Cell';
-import Details from './components/Details';
-import Sort from './components/Sort';
+import { connect } from 'react-redux';
+import '../App.scss';
+import Search from '../components/Search';
+import Error from '../components/Error';
+import Loading from '../components/Loading';
+import Cell from '../components/Cell';
+import Details from '../components/Details';
+import Sort from '../components/Sort';
 
 function App() {
   const [isLoading, setLoadingState] = useState(false);
@@ -14,6 +14,7 @@ function App() {
   const [repositories, updateRepositories] = useState([]);
   const [selectedRepoDetails, updateSelectedDetails] = useState(null);
   const [favoriteReposList, updateFavoriteReposList] = useState([]);
+  const [next, setNext] = useState("");
 
   /**
    * Called when GitHub API calls finishes
@@ -96,8 +97,17 @@ function App() {
       <div className="detailsContainer">
         <Details repo={selectedRepoDetails} />
       </div>
+
+      {
+        next.trim().length !== 0 ? <p>Next</p> : null
+      }
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state, ownProps) => ({
+  errorMessage: state.errorMessage,
+  inputValue: ownProps.location.pathname.substring(1)
+})
+
+export default connect(mapStateToProps)(App);
