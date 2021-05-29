@@ -11,7 +11,7 @@ import './details.scss';
  *    @property url - string
  *    @property avatar - string
  */
-function Details({ repo }) {
+function Details({ repo, onClose }) {
   if (!repo) return null;
 
   const { avatar, owner, title, stars, timestamp, url } = repo;
@@ -22,6 +22,7 @@ function Details({ repo }) {
 
   return (
     <div className="detailsTopContainer">
+      <span className="detailCloseIcon" onClick={onClose}>&#10006;</span>
       <div className="imageContainer">
         <img alt="github repo owner" src={avatar} />
       </div>

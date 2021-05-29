@@ -2,7 +2,7 @@
 
 .rowContainer {
   display: flex;
-  flex: 1;
+  flex: 0;
   height: 60px;
   margin: 1em 0;
   align-items: center;
@@ -76,4 +76,26 @@
   }
 
 
+}
+
+
+@media screen and (max-width:780px) {
+  .rowContainer {
+  padding: 0;
+  height: auto;
+  .rowContent{
+    img {
+      width: 30px;
+      height: 30px;
+    }
+    p.owner {
+      font-size: 11px;
+    }
+    .stars {
+      p{
+        font-size: 15px;
+      }
+    }
+  }
+  }
 }

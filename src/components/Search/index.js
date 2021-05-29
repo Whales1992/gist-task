@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import './search.scss';
 import { fetchGitHubRepo } from '../../api';
 
@@ -9,13 +9,20 @@ import { fetchGitHubRepo } from '../../api';
 function Search({ onSearchResults, updateLoadingState, stopUpdating }) {
   const [text, updateText] = React.useState('');
 
-  async function fetchItems() {
-    updateLoadingState(true)
 
-    const result = await fetchGitHubRepo(text);
-    onSearchResults && onSearchResults(result);
-    updateLoadingState(false);
-  }
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+        updateLoadingState(true);
+        fetchGitHubRepo(text).then(res => {
+          onSearchResults(res);
+          updateLoadingState(false);
+        });       
+      }, 3000);
+    return () => clearTimeout(delayDebounceFn);
+  }, [text]);
+
+ 
+
 
   return (
     <div className="searchContainer">
@@ -25,8 +32,6 @@ function Search({ onSearchResults, updateLoadingState, stopUpdating }) {
         onChange={({ target: { value } }) => updateText(value)}
         type="text"
       />
-
-      <button onClick={() => fetchItems(text)}>search</button>
     </div>
   );
 }

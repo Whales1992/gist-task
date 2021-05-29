@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,Fragment } from 'react';
 import { connect } from 'react-redux';
 import '../App.scss';
 import Search from '../components/Search';
@@ -14,7 +14,10 @@ function App() {
   const [repositories, updateRepositories] = useState([]);
   const [selectedRepoDetails, updateSelectedDetails] = useState(null);
   const [favoriteReposList, updateFavoriteReposList] = useState([]);
-  const [next, setNext] = useState("");
+  const [arrayDataSize,setArrayDataSize] = useState({
+    start:0,
+    end:20
+  });
 
   /**
    * Called when GitHub API calls finishes
@@ -35,6 +38,9 @@ function App() {
 
     if (error) {
       setErrorMessage(error);
+      setTimeout(()=>{
+        setErrorMessage(null);
+      },1500);
     } else {
       updateRepositories(repos || []);
     }
@@ -57,6 +63,10 @@ function App() {
     updateFavoriteReposList(favList);
   }
 
+  const setArraySize = (start,end)=>{
+    setArrayDataSize({start,end});
+  }
+
   const hasResults = repositories.length > 0;
 
   return (
@@ -75,32 +85,104 @@ function App() {
         {hasResults ? (
           <div className="resultContainer">
             <Sort onSort={updateRepositories} currentRepos={repositories} />
-            {repositories.map(repo => (
-              <Cell
-                  onAddToFavorite={(repoId) => onAddToFavorite(repoId)}
-                onPress={() => updateSelectedDetails(repo)}
-                key="repo"
-                id={repo.id}
-                avatar={repo.avatar}
-                owner={repo.owner}
-                title={repo.title}
-                stars={repo.stars}
-                timestamp={repo.timestamp}
-                url={repo.url}
+            {repositories
+              .slice(arrayDataSize.start, arrayDataSize.end)
+              .map(repo => (
+                <Cell
+                  onAddToFavorite={repoId => onAddToFavorite(repoId)}
+                  onPress={() => updateSelectedDetails(repo)}
+                  key={'repo' + repo.id}
+                  id={repo.id}
+                  avatar={repo.avatar}
+                  owner={repo.owner}
+                  title={repo.title}
+                  stars={repo.stars}
+                  timestamp={repo.timestamp}
+                  url={repo.url}
                   isFavorite={favoriteReposList.includes(repo.id)}
-              />
-            ))}
+                />
+              ))}
+            <div className="buttonContainer">
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  if (arrayDataSize.end - 20 <= 0) {
+                  } else {
+                    setArraySize(
+                      arrayDataSize.start - 20,
+                      arrayDataSize.end - 20,
+                    );
+                  }
+                }}>
+                Prev
+              </button>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  setArraySize(0, 20);
+                }}>
+                1
+              </button>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  setArraySize(20, 40);
+                }}>
+                2
+              </button>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  setArraySize(40, 60);
+                }}>
+                3
+              </button>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  setArraySize(60, 80);
+                }}>
+                4
+              </button>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  setArraySize(80, 100);
+                }}>
+                5
+              </button>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  if (arrayDataSize.end + 20 > repositories.length) {
+                  } else {
+                    setArraySize(
+                      arrayDataSize.start + 20,
+                      arrayDataSize.end + 20,
+                    );
+                  }
+                }}>
+                Next
+              </button>
+            </div>
           </div>
         ) : null}
       </div>
-
-      <div className="detailsContainer">
-        <Details repo={selectedRepoDetails} />
-      </div>
-
-      {
-        next.trim().length !== 0 ? <p>Next</p> : null
-      }
+      {selectedRepoDetails && (
+        <div className="detailsContainer">
+          <Details repo={selectedRepoDetails} />
+        </div>
+      )}
+      {selectedRepoDetails && (
+        <div className="detailsContainerModal">
+          <Details
+            repo={selectedRepoDetails}
+            onClose={() => {
+              updateSelectedDetails(null);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
